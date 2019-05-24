@@ -1,0 +1,188 @@
+<!-- Top section (aka the blue section) -->
+<section class="top flex-child-auto">
+
+  <div class="row">
+
+    <div class="small-12 large-7 column">
+      <h1>Run your application with zero overhead</h1>
+      <p>IncludeOS allows you to run your application in the cloud without an operating system. IncludeOS adds operating system functionality to your application allowing you to create performant, secure and resource efficient virtual machines.</p>
+      <p>IncludeOS applications boot in tens of milliseconds and require only a few megabytes of disk and memory. </p>
+      <div class="row">
+        <div class="stacked-for-small button-group">
+          <a class="primary hollow button" href="https://github.com/includeos/IncludeOS">VIEW ON GITHUB</a>
+          <a class="primary hollow button" href="https://goo.gl/NXBVsc">CHAT ON SLACK</a>
+          <a class="primary hollow button" href="/technology.html">TELL ME MORE</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="list small-12 large-5 column hide-for-small-only">
+
+      <div class="row align-middle">
+        <div class="icons small-2 medium-1 large-2 column">
+          <div class="wrapper">
+          <img src="/resources/img/bullet.svg" alt="includeOS">
+          </div>
+        </div>
+        <div class="small-10 medium-11 large-10 column">
+          <p>Performant. No operating system overhead.</p>
+        </div>
+      </div>
+
+      <div class="row align-middle">
+        <div class="icons small-2 medium-1 large-2 column">
+          <div class="wrapper">
+          <img src="/resources/img/bullet.svg" alt="includeOS">
+          </div>
+        </div>
+        <div class="small-10 medium-11 large-10 column">
+        <p>Perfectly portable. Runs on all major hypervisors.</p>
+        </div>
+      </div>
+
+      <div class="row align-middle">
+        <div class="icons small-2 medium-1 large-2 column">
+          <div class="wrapper">
+          <img src="/resources/img/bullet.svg" alt="includeOS">
+          </div>
+        </div>
+        <div class="small-10 medium-11 large-10 column">
+          <p>Secure. No unused code in your image.</p>
+        </div>
+      </div>
+
+      <div class="row align-middle">
+        <div class="icons small-2 medium-1 large-2 column">
+          <div class="wrapper">
+          <img src="/resources/img/bullet.svg" alt="includeOS">
+          </div>
+        </div>
+        <div class="small-10 medium-11 large-10 column">
+          <p>Lean. Base virtual image starts at about 1 megabyte.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- Middle section (aka the yellow section) -->
+<section id="middle" class="middle flex-child-auto">
+
+  <div class="row aling-middle">
+     <div class="small-12 large-12 column">
+      <h2>Get started</h2>
+
+      <div class="small-12 large-8">
+      <p>To run a service with IncludeOS on Linux or macOS you do not need to install IncludeOS, however you need to install a few dependencies depending on the service you will run. You can start by trying out our simplest hello_world service. For this service you will need the following dependencies.
+      <ul type = "circle">
+       <li><a href="https://docs.conan.io/en/latest/installation.html">Conan package manager</a></li>
+       <li>cmake, make, nasm</li>
+       <li>clang, or alternatively gcc on linux. Prebuilt packages are available for clang 6.0 and gcc 7.3</li>
+       <li>qemu</li>
+       <li>python3 packages: psutil, jsonschema</li>
+     </ul>
+     </p>
+     <p>With the above dependencies you should be able to build an application within minutes.
+        <pre><code class="bash">$ conan config install https://github.com/includeos/conan_config.git
+$ git clone https://github.com/includeos/hello_world.git
+$ mkdir build_hello_world
+$ cd build_hello_world
+$ conan install ../hello_world -pr <your_conan_profile>
+$ source ./activate.sh
+$ cmake ../hello_world
+$ cmake --build .
+$ boot hello
+        </code></pre>
+
+        The hello world booted service should look like this:
+        <pre><code>
+================================================================================
+ IncludeOS 0.14.1-1093 (x86_64 / 64-bit)
+ +--> Running [ Hello world - OS included ]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hello world
+    [ main ] returned with status 0
+    </code></pre>
+    </p>
+    <p>For detailed instructions see the <a href="https://github.com/includeos/IncludeOS/blob/master/README.md">GitHub README</a>.
+    Once installed we suggest looking at and booting a few of the <a href="https://github.com/includeos/demo-examples">demo-examples</a> to familarize yourself with the system.
+    </p>
+    <p>We strive to make it easy to create fast and useful services. The below code will set up a simple TCP echo service and happily talk to anyone connecting.
+    </p>
+        <pre><code class="c++">#include &lt;os&gt;
+#include &lt;iostream&gt;
+#include &lt;net/interfaces&gt;
+
+void Service::start()
+{
+  // Get the IP stack thats already been automatically configured
+  auto& inet = net::Interfaces::get(0);
+  // Setup a TCP echo server on port 7 (echo port)
+  auto& server = inet.tcp().listen(7);
+
+  server.on_connect([] (auto conn) {
+    // Log incomming connections on the console:
+    std::cout << "Connection " << conn->to_string() << " established\n";
+    // When data is received, echo back
+    conn->on_read(1024, [conn] (auto buf) {
+      conn->write(buf);
+    });
+  });
+}</code></pre>
+
+The network configuration of the virtual machine can reside in a JSON file, named config.json, placed in the same folder. It should look something like this, depending on your need:
+<pre><code class="json">{
+  "net" : [
+    {
+      "iface": 0,
+      "config": "dhcp-with-fallback",
+      "address": "10.0.0.42",
+      "netmask": "255.255.255.0",
+      "gateway": "10.0.0.1"
+    }
+  ]
+}
+</code></pre>
+
+</p>
+    </div>
+    </div>
+  </div>
+    <!--
+    <div class="small-12 medium-6 column text-center hide-for-small-only">
+      <img class="squirrel" src="/resources/img/squirrel2.png" alt="squirrel">
+    </div> -->
+  </div>
+</section>
+<section id="last" class="last flex-child-auto">
+  <div class="row">
+     <div class="small-12 large-12 column">
+      <h2>Security</h2>
+
+      <div class="small-12 large-8">
+      <p>For security related inquires please send email to security@includeos.org. You can use our <a href="https://pgp.mit.edu/pks/lookup?search=security@includeos.org&op=index">PGP key</a> to encrypt the email.
+      </p>
+    </div>
+  </div>
+</div>
+</section>
+<!--
+  <div class="row align-middle align-center text-center">
+    <div class="small-12 column">
+      <h2>Major contributions to IncludeOS by these fine folks:</h2>
+    </div>
+
+    <div class="small-6 medium-2 column">
+      <a href="http://www.hioa.no/eng"><img src="/resources/img/clients/hioa-logo-middels-neg-eng.png"></a>
+    </div>
+    <div class="small-6 medium-2 column">
+      <a href="http://www.research.ibm.com/"><img src="/resources/img/clients/ibmwhite.png"></a>
+    </div>
+    <div class="small-6 medium-2 column">
+      <a href="http://www.unikernel.org/"><img src="/resources/img/clients/unikernel-logo-inverted.png"></a>
+    </div>
+  </div>
+-->
+</section>
