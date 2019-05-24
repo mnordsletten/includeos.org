@@ -8,6 +8,7 @@ description:            "IncludeOS is an open source library operating system."
 include:
   - ".htaccess"
   - "_pages"
+  - "resources"
 
 exclude:
   - "/assets/"
